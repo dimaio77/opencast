@@ -34,4 +34,58 @@ On the server side:
 
 
 
+Songboard / HUD Commands
+------------------------
 
+All commands are prefixed with /42 e.g. '/42 next'
+Opencast has two modes, relay and jukebox. Relay mode plays a remote stream, jukebox mode is chat controlled autodj.
+
+
+`switch <stream URL>`
+
+
+   Relay an Icecast or Shoutcast stream without disconnecting listeners
+
+`jukebox`
+
+   Switch to jukebox mode - chat controlled autodj
+
+`next`
+
+   Skip to next song in current playlist.
+
+`prev`
+
+   Skip to previous song in current playlist.
+
+`load <playlist>`
+
+   Load the selected playlist and start playing it immediately.
+
+`del <nbr>`
+
+   Delete song <nbr> from current playlist.
+
+`move <from to>`
+
+  Move song <from> to position <to> in the current playlist.
+
+`search artist <name>`
+
+  Show songs by artist named <name>
+
+`add song <name>`
+
+  Add songs by <name> to the current playlist
+
+`search song <name>`
+
+  Show songs by name <name>
+
+`add song <name>`
+
+  Add songs named <name> to the current playlist
+
+`crop`
+
+  Delete all songs after the current playing song
