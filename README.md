@@ -20,7 +20,7 @@ Opencast Songboard/HUD ->  (http requests) -> Flask -> mpd -> liquidsoap -> Icec
 In Second Life:
 ---------------
 
-Opencast songboard - (LSL) 10 line / 96 character songboard controls jukebox and switching streams
+Opencast songboard - (LSL) 10 line x 96 character songboard controls jukebox and switching streams
 Opencast HUD - (LSL) used to switch streams and control jukebox
 
 On the server side:
