@@ -128,12 +128,19 @@ class Dispatcher(object):
         * Relay stream (Displays stream URL, name, artist - song
         * Jukebox (First 10 songs displayed)'''
 
+        cur_song = self.client.currentsong()
+        if cur_song.has_key('file') and cur_song['file'].startswith('http'):
+            return self.display_stream()
+        else:
+            return self.display_playlist()
+
+    def display_stream(self):
+        cur_song = self.client.currentsong()
         current = self.get_pos()
         if current > 3:
             self.client.delete(0)
 
         playlist = self.client.playlistid()
-        cur_song = self.client.currentsong()
         # Streaming mode:
         if cur_song.has_key('name'):
              name = cur_song['name']
@@ -143,17 +150,34 @@ class Dispatcher(object):
              title = cur_song['title']
         else:
              title = 'Unknown - Unknown'
-        if cur_song.has_key('file') and cur_song['file'].startswith('http'):
-             text = "%s" % "\n".join(textwrap.wrap(name, 96))
-             text += '\n \n \n'
-             artist, song =  title.split('-')
-             text += "Artist: %s\n" % artist
-             text += "\n  Song: %s" % song.strip()
-             text += "\n \nStream URL: %s " % cur_song['file']
-             text += "\n \n"
-             return text
+        text = "%s" % "\n".join(textwrap.wrap(name, 96))
+        text += '\n \n \n'
+        artist, song =  title.split('-')
+        text += "Artist: %s\n" % artist
+        text += "\n  Song: %s" % song.strip()
+        text += "\n \nStream URL: %s " % cur_song['file']
+        text += "\n \n"
+        return text
+
+    def display_playlist(self):
+
+        cur_song = self.client.currentsong()
+        current = self.get_pos()
+        if current > 3:
+            self.client.delete(0)
+
+        playlist = self.client.playlistid()
+        # Streaming mode:
+        if cur_song.has_key('name'):
+             name = cur_song['name']
+        else:
+             name = 'Unknown'
+        if cur_song.has_key('title'):
+             title = cur_song['title']
+        else:
+             title = 'Unknown - Unknown'
         # Jukebox mode:
-	lines = "\n"
+        lines = "\n"
         d = 0
         for song in playlist:
             d += 1
@@ -173,11 +197,11 @@ class Dispatcher(object):
                     artist = ''
                 else:
                     artist = 'Unknown'
-            if current and d == current + 1:
+            if d == current + 1:
                 lines += '* %s) %s - %s [Now playing]\n' % (pos, artist, title) 
             else:
                 lines += '  %s) %s - %s\n' % (pos, artist, title)
-            if d >8: break
+            if d >= 10: break
         return lines 
 
     def do_help(self):
