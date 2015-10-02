@@ -8,8 +8,12 @@ Author: Carrie Vordun
 
 '''
 
+import textwrap
+import os
+
 import mpd
 
+PLAYLIST_DIR='/var/lib/mpd/playlists/'
 
 class MyMPD(object):
 
@@ -75,19 +79,23 @@ class Dispatcher(object):
 
     def do_load(self, playlist):
         '''Load playlist and start playing it immediately'''
-        try:
-            self.client.clear()
-            self.client.load(playlist)
-            self.client.play()
-            return "Playlist '%s' queued." % playlist
-        except mpd.CommandError:
-            return "No such playlist. Hint? Playlists are case-sensitive."
+        file = '%s%s.m3u' % (PLAYLIST_DIR, playlist)
+        if os.path.isfile(file):
+            try:
+                self.client.clear()
+                self.client.load(playlist)
+                self.client.play()
+                return "Playlist '%s' queued." % playlist
+            except mpd.CommandError:
+                self.do_jukebox()
+        return "No such playlist (%s). Hint? Playlists are case-sensitive." % playlist
 
     def do_add(self, path):
         '''Clear playlist and load songs in path'''
         self.client.clear()
         self.client.add(path)
         self.client.shuffle()
+        self.client.play()
         return "Added %s" % path
 
     def do_current(self):
@@ -127,20 +135,21 @@ class Dispatcher(object):
         playlist = self.client.playlistid()
         cur_song = self.client.currentsong()
         # Streaming mode:
-        if cur_song().has_key('name'):
-             name = cur_song()['name']
+        if cur_song.has_key('name'):
+             name = cur_song['name']
         else:
              name = 'Unknown'
-        if cur_song().has_key('title'):
-             title = cur_song()['title']
+        if cur_song.has_key('title'):
+             title = cur_song['title']
         else:
              title = 'Unknown - Unknown'
-        if cur_song().has_key('file') and cur_song()['file'].startswith('http'):
-             text = "Streaming: %s " % cur_song()['file']
-             text += "\n \n" + name + '\n \n'
+        if cur_song.has_key('file') and cur_song['file'].startswith('http'):
+             text = "%s" % "\n".join(textwrap.wrap(name, 96))
+             text += '\n \n \n'
              artist, song =  title.split('-')
              text += "Artist: %s\n" % artist
-             text += "Song: %s" % song
+             text += "\n  Song: %s" % song.strip()
+             text += "\n \nStream URL: %s " % cur_song['file']
              text += "\n \n"
              return text
         # Jukebox mode:
@@ -148,20 +157,23 @@ class Dispatcher(object):
         d = 0
         for song in playlist:
             d += 1
-            pos = int(b['pos']) + 1
+            pos = int(song['pos']) + 1
             if song.has_key('title'):
-                title = b['title']
+                title = song['title']
             else:
                 #We have a stream queued
                 if song['file'].startswith('http'):
-                    title = b['file']
+                    title = song['file']
                 else:
                     title = 'Unknown'
             if song.has_key('artist'):
                 artist = song['artist']
             else:
-                artist = 'Unknown'
-            if d == current + 1:
+                if song['file'].startswith('http'):
+                    artist = ''
+                else:
+                    artist = 'Unknown'
+            if current and d == current + 1:
                 lines += '* %s) %s - %s [Now playing]\n' % (pos, artist, title) 
             else:
                 lines += '  %s) %s - %s\n' % (pos, artist, title)
