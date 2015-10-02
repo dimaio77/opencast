@@ -135,13 +135,13 @@ class Dispatcher(object):
             return self.display_playlist()
 
     def display_stream(self):
+        '''Display stream and song info when in relay mode'''
         cur_song = self.client.currentsong()
         current = self.get_pos()
         if current > 3:
             self.client.delete(0)
 
         playlist = self.client.playlistid()
-        # Streaming mode:
         if cur_song.has_key('name'):
              name = cur_song['name']
         else:
@@ -160,14 +160,12 @@ class Dispatcher(object):
         return text
 
     def display_playlist(self):
-
+        '''Display 10 songs from playlist in jukebox mode'''
         cur_song = self.client.currentsong()
         current = self.get_pos()
         if current > 3:
             self.client.delete(0)
-
         playlist = self.client.playlistid()
-        # Streaming mode:
         if cur_song.has_key('name'):
              name = cur_song['name']
         else:
@@ -176,7 +174,6 @@ class Dispatcher(object):
              title = cur_song['title']
         else:
              title = 'Unknown - Unknown'
-        # Jukebox mode:
         lines = "\n"
         d = 0
         for song in playlist:
