@@ -1,4 +1,4 @@
-# opencast
+# Opencast
 
 Advanced audio streaming system for Second Life.
 ================================================
@@ -30,7 +30,7 @@ On the server side:
 * mpd - Music Player Daemon controlls the jukebox and relaying streams
 * python-mp2 - Python library used to control mpd server
 * liquidsoap - The liquidsoap server ensures continuous streaming without dropping listeners; switches to a playlist when it detects silence or Dj drops out
-* Icecast - The audio streaming server. (Shoutcast blows.)
+* Icecast - The audio streaming server.
 
 
 
