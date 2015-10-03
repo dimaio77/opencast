@@ -13,6 +13,7 @@ import os
 
 import mpd
 
+
 PLAYLIST_DIR='/var/lib/mpd/playlists/'
 
 class MyMPD(object):
@@ -137,11 +138,6 @@ class Dispatcher(object):
     def display_stream(self):
         '''Display stream and song info when in relay mode'''
         cur_song = self.client.currentsong()
-        current = self.get_pos()
-        if current > 3:
-            self.client.delete(0)
-
-        playlist = self.client.playlistid()
         if cur_song.has_key('name'):
              name = cur_song['name']
         else:
@@ -162,8 +158,8 @@ class Dispatcher(object):
     def display_playlist(self):
         '''Display 10 songs from playlist in jukebox mode'''
         cur_song = self.client.currentsong()
-        current = self.get_pos()
-        if current > 3:
+        current_pos = self.get_pos()
+        if current_pos > 3:
             self.client.delete(0)
         playlist = self.client.playlistid()
         if cur_song.has_key('name'):
@@ -194,12 +190,64 @@ class Dispatcher(object):
                     artist = ''
                 else:
                     artist = 'Unknown'
-            if d == current + 1:
-                lines += '* %s) %s - %s [Now playing]\n' % (pos, artist, title) 
+            if d == current_pos + 1:
+                lines += '* %s) %s - %s [Now playing]\n' % (pos, artist, title)
             else:
                 lines += '  %s) %s - %s\n' % (pos, artist, title)
             if d >= 10: break
-        return lines 
+        return lines
+
+    def do_artist(self, artist):
+        '''Search for songs by artist'''
+        tracks = self.client.search('artist', artist)
+        text = ""
+        i = 0
+        for song in tracks:
+            text += '%s - %s\n' % (song['artist'], song['title'])
+            if i >= 10:
+                break
+        return text
+
+    def do_artistadd(self, artist):
+        '''Search for songs by artist and add to current playlist'''
+        tracks = self.client.search('artist', artist)
+        text = "Added these to current playlist:\n"
+        pos = self.get_pos()
+        i = 0
+        for song in tracks:
+            self.client.addid(song['file'], pos+1)
+            if i < 10:
+                text += '%s - %s\n' % (song['artist'], song['title'])
+        return text
+
+
+    def do_song(self, title):
+        '''Search for songs by title'''
+        tracks = self.client.search('title', title)
+        text = ""
+        i = 0
+        for song in tracks:
+            if i < 10:
+                try:
+                    text += '%s - %s\n' % (song['artist'], song['title'])
+                except KeyError:
+                    text += song['file']
+        return text
+
+    def do_songadd(self, title):
+        '''Search for songs by title and add to current playlist'''
+        tracks = self.client.search('title', title)
+        text = "Added these to current playlist:\n"
+        pos = self.get_pos()
+        i = 0
+        for song in tracks:
+            self.client.addid(song['file'], pos+1)
+            if i < 10:
+                try:
+                    text += '%s - %s\n' % (song['artist'], song['title'])
+                except KeyError:
+                    pass
+        return text
 
     def do_help(self):
         return '''
