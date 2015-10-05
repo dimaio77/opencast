@@ -8,6 +8,7 @@ Author: Carrie Vordun
 
 '''
 
+import time
 import textwrap
 import os
 
@@ -45,18 +46,30 @@ class Dispatcher(object):
         except KeyError:
             return None
 
+    def do_clear(self):
+        '''Clear playlist including current song'''
+        self.client.clear()
+        return "Playlist cleared! You have 10 seconds to add a playlist."
+
     def do_crop(self):
         '''Crop playlist after current playing song'''
         pos = self.get_pos()
         self.client.delete((pos + 1,))
         return "Playlist cropped!"
 
+    def do_metadata(self, metadata):
+        '''Change stream metadata'''
+        pass
+
     def do_switch(self, stream_url):
         """Relay another stream"""
-        self.client.clear()
-        self.client.add(stream_url)
-        self.client.play()
-        return "Switching stream to %s" % args
+        if stream_url.startswith('http://'):
+            self.client.clear()
+            self.client.add(stream_url)
+            self.client.play()
+            return "Switching stream to %s" % stream_url
+        else:
+            return "Stream URLs start with http://"
 
     def do_next(self):
         '''Skip to next song in current playlist'''
@@ -90,6 +103,23 @@ class Dispatcher(object):
             except mpd.CommandError:
                 self.do_jukebox()
         return "No such playlist (%s). Hint? Playlists are case-sensitive." % playlist
+
+    def do_save(self, playlist):
+        '''Save current playlist
+        TODO: Prefix playlist names with user name for easier management.'''
+        if ' ' in playlist:
+            return "Please use a single word for the playlist name."
+        file = '%s%s.m3u' % (PLAYLIST_DIR, playlist)
+        if os.path.isfile(file):
+            return "Playlist already exists!"
+        self.client.save(playlist)
+        return "Playlist '%s' saved!" % playlist
+
+    def do_switchnext(self, path):
+        '''Load path into playlist after current song'''
+        pos = self.get_pos()
+        self.client.addid(path, pos + 1)
+        return "%s will be streamed next." % path
 
     def do_add(self, path):
         '''Clear playlist and load songs in path'''
@@ -130,6 +160,16 @@ class Dispatcher(object):
         * Jukebox (First 10 songs displayed)'''
 
         cur_song = self.client.currentsong()
+        status = self.client.status()
+        print status
+        print cur_song
+        if int(status['playlistlength']) == 0:
+            #Wait in case playlist is being manipulated, then fill playlist
+            time.sleep(10)
+            if int(status['playlistlength']) == 0:
+                self.do_jukebox()
+        elif status['state'] == 'stop':
+            self.client.play()
         if cur_song.has_key('file') and cur_song['file'].startswith('http'):
             return self.display_stream()
         else:
@@ -148,7 +188,12 @@ class Dispatcher(object):
              title = 'Unknown - Unknown'
         text = "%s" % "\n".join(textwrap.wrap(name, 96))
         text += '\n \n \n'
-        artist, song =  title.split('-')
+        print title
+        try:
+            artist, song =  title.split('-')
+        except ValueError:
+            artist = ""
+            song = title
         text += "Artist: %s\n" % artist
         text += "\n  Song: %s" % song.strip()
         text += "\n \nStream URL: %s " % cur_song['file']
@@ -190,12 +235,28 @@ class Dispatcher(object):
                     artist = ''
                 else:
                     artist = 'Unknown'
+            if current_pos == None:
+                current_pos = 0
             if d == current_pos + 1:
-                lines += '* %s) %s - %s [Now playing]\n' % (pos, artist, title)
+                status = self.client.status()
+                length = cur_song['time']
+                lm, ls = divmod(int(float(length)), 60)
+                h, lm = divmod(lm, 60)
+                lcur = "%02d:%02d" % (lm, ls)
+
+                m, s = divmod(int(float(status['elapsed'])), 60)
+                h, m = divmod(m, 60)
+                cur = "%02d:%02d" % (m, s)
+                lines += '* %s) %s - %s (%s/%s)\n' % (pos, artist, title, lcur, cur)
             else:
                 lines += '  %s) %s - %s\n' % (pos, artist, title)
             if d >= 10: break
         return lines
+
+    def do_delete(self, pos):
+        '''Delete entry in playlist'''
+        self.client.delete(int(pos) - 1)
+        return "Deleted track %s from playlist." % pos
 
     def do_artist(self, artist):
         '''Search for songs by artist'''
