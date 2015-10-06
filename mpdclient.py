@@ -91,7 +91,7 @@ class Dispatcher(object):
         '''Change stream metadata
         TODO
         This will be really useful for Dj's who live mix with Traktor etc.
-        where mixing multiple songs results in stream metadata changing 
+        where mixing multiple songs results in stream metadata changing
         rapidly. We can allow the dj to set a static string.'''
 
     def do_switch(self, stream_url):
@@ -202,12 +202,12 @@ class Dispatcher(object):
     def do_current(self):
         '''Display information about current song playing'''
         current = self.client.currentsong()
-        if current.has_key('artist') and current.has_key('title'):
+        if 'artist' in current and 'title' in current:
             return '%s - %s' % (current['artist'], current['title'])
-        elif current.has_key('title'):
+        elif 'title' in current:
             return current['title']
-        elif not current.has_key('title') and not current.has_key('artist'):
-            if current.has_key('name'):
+        elif 'title' not in current and 'artist' not in current:
+            if 'name' in current:
                 return current['name']
             else:
                 return 'Unknown - Unknown'
@@ -241,7 +241,7 @@ class Dispatcher(object):
                 self.do_jukebox()
         elif status['state'] == 'stop':
             self.client.play()
-        if cur_song.has_key('file') and cur_song['file'].startswith('http'):
+        if 'file' in cur_song and cur_song['file'].startswith('http'):
             return self.display_stream()
         else:
             return self.display_playlist()
@@ -249,11 +249,11 @@ class Dispatcher(object):
     def display_stream(self):
         '''Display stream and song info when in relay mode'''
         cur_song = self.client.currentsong()
-        if cur_song.has_key('name'):
+        if 'name' in cur_song:
             name = cur_song['name']
         else:
             name = 'Unknown'
-        if cur_song.has_key('title'):
+        if 'title' in cur_song:
             title = cur_song['title']
         else:
             title = 'Unknown - Unknown'
@@ -277,11 +277,11 @@ class Dispatcher(object):
         if current_pos > 3:
             self.client.delete(0)
         playlist = self.client.playlistid()
-        if cur_song.has_key('name'):
+        if 'name' in cur_song:
             name = cur_song['name']
         else:
             name = 'Unknown'
-        if cur_song.has_key('title'):
+        if 'title' in cur_song:
             title = cur_song['title']
         else:
             title = 'Unknown - Unknown'
@@ -290,7 +290,7 @@ class Dispatcher(object):
         for song in playlist:
             d += 1
             pos = int(song['pos']) + 1
-            if song.has_key('title'):
+            if 'title' in song:
                 title = song['title']
             else:
                 # We have a stream queued
@@ -298,7 +298,7 @@ class Dispatcher(object):
                     title = song['file']
                 else:
                     title = 'Unknown'
-            if song.has_key('artist'):
+            if 'artist' in song:
                 artist = song['artist']
             else:
                 if song['file'].startswith('http'):
