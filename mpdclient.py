@@ -8,15 +8,15 @@ Author: Carrie Vordun
 
 '''
 
-import json
-import time
-import textwrap
 import os
+import json
+import textwrap
+import time
 
 import mpd
 
-
 PLAYLIST_DIR='/var/lib/mpd/playlists/'
+
 
 class MyMPD(object):
 
@@ -34,7 +34,7 @@ class MyMPD(object):
 class Dispatcher(object):
     '''Command dispatcher
 
-    All class methods starting with 'do_' are mpd commands
+    All class methods starting with 'do_' correspond with mpd commands
     received from the Second Life user.'''
 
     def __init__(self, client):
@@ -59,6 +59,21 @@ class Dispatcher(object):
         except KeyError:
             return 0
 
+    def do_pause(self):
+        '''Pause current song'''
+        self.client.pause()
+        return 'Paused.'
+
+    def do_play(self):
+        '''Pause current song'''
+        self.client.play()
+        return 'Playing.'
+
+    def do_stop(self):
+        '''Pause current song'''
+        self.client.stop()
+        return 'Stopped.'
+
     def do_clear(self):
         '''Clear playlist including current song'''
         self.client.clear()
@@ -71,9 +86,11 @@ class Dispatcher(object):
         return "Playlist cropped!"
 
     def do_metadata(self, metadata):
-        '''Change stream metadata'''
-        #TODO
-        #This is really useful for Dj's who live mix with Traktor etc.
+        '''Change stream metadata
+        TODO
+        This will be really useful for Dj's who live mix with Traktor etc.
+        where mixing multiple songs results in stream metadata changing 
+        rapidly. We can allow the dj to set a static string.'''
 
     def do_switch(self, stream_url):
         """Relay another stream"""
