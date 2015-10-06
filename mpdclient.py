@@ -8,6 +8,7 @@ Author: Carrie Vordun
 
 '''
 
+import json
 import time
 import textwrap
 import os
@@ -39,17 +40,29 @@ class Dispatcher(object):
     def __init__(self, client):
         self.client = client
 
+    def dispatch(self, command, args):
+        '''Execute a command received from Second Life'''
+        mpd_command = 'do_' + command
+        if hasattr(self, mpd_command):
+            method = getattr(self, mpd_command)
+            if args:
+                return method(args)
+            else:
+                return method()
+        else:
+            return "No such command %s" % command
+
     def get_pos(self):
         '''Get current position in playlist'''
         try:
            return int(self.client.currentsong()['pos'])
         except KeyError:
-            return None
+            return 0
 
     def do_clear(self):
         '''Clear playlist including current song'''
         self.client.clear()
-        return "Playlist cleared! You have 10 seconds to add a playlist."
+        return "Playlist cleared! You have 10 seconds to add a playlist, or I'll pick the songs!"
 
     def do_crop(self):
         '''Crop playlist after current playing song'''
@@ -59,7 +72,8 @@ class Dispatcher(object):
 
     def do_metadata(self, metadata):
         '''Change stream metadata'''
-        pass
+        #TODO
+        #This is really useful for Dj's who live mix with Traktor etc.
 
     def do_switch(self, stream_url):
         """Relay another stream"""
@@ -76,16 +90,48 @@ class Dispatcher(object):
         self.client.next()
         return "Skipping to next song in jukebox..."
 
+    def do_rewind(self):
+        '''Skip to previous song in current playlist'''
+        self.client.seekcur(0)
+        return "Rewinding current song in jukebox..."
+
+    def do_playlists(self):
+        '''Show all playlists by name'''
+        lines = ''
+        lists = self.client.listplaylists()
+        for line in lists:
+            lines += '%s\n' % line['playlist']
+        return lines
+
+    def do_show(self, playlist):
+        '''Show contents of named playlist
+        TODO: Print metadata instead of path'''
+        tracks = "\n"
+        tracks += "\n".join(self.client.listplaylist(playlist))
+        return tracks
+
     def do_prev(self):
         '''Skip to previous song in current playlist'''
         self.client.previous()
         return "Skipping to previous song in jukebox..."
 
+    def do_jump(self, pos):
+        '''Skip to song pos in playlist'''
+        cur_pos = self.get_pos()
+        self.client.play(int(pos) - 1)
+        self.client.delete((0,cur_pos))
+        return "Skipping to song %s..." % pos
+
+    def do_shuffle(self):
+        '''Shuffle the current playlist'''
+        self.client.shuffle()
+        return "Shuffled!"
+
     def do_stats(self):
         '''Show number of songs, albums and artists in jukebox'''
         stats = self.client.stats()
         return "Jukebox contains - Songs: %s, Artists: %s, Albums: %s" % \
-            (stats()['songs'], stats()['artists'], stats()['albums'])
+            (stats['songs'], stats['artists'], stats['albums'])
 
     def do_move(self, pos_from, pos_to):
         '''Move song from its position to another in the current playlist'''
@@ -129,6 +175,11 @@ class Dispatcher(object):
         self.client.play()
         return "Added %s" % path
 
+    def do_dump(self):
+        '''Display full info for current song'''
+        current=self.client.currentsong()
+        return '%s' % json.dumps(current, indent=1)
+
     def do_current(self):
         '''Display information about current song playing'''
         current=self.client.currentsong()
@@ -161,8 +212,9 @@ class Dispatcher(object):
 
         cur_song = self.client.currentsong()
         status = self.client.status()
-        print status
-        print cur_song
+        #DEBUG
+        #print status
+        #print cur_song
         if int(status['playlistlength']) == 0:
             #Wait in case playlist is being manipulated, then fill playlist
             time.sleep(10)
@@ -188,7 +240,6 @@ class Dispatcher(object):
              title = 'Unknown - Unknown'
         text = "%s" % "\n".join(textwrap.wrap(name, 96))
         text += '\n \n \n'
-        print title
         try:
             artist, song =  title.split('-')
         except ValueError:
@@ -235,8 +286,6 @@ class Dispatcher(object):
                     artist = ''
                 else:
                     artist = 'Unknown'
-            if current_pos == None:
-                current_pos = 0
             if d == current_pos + 1:
                 status = self.client.status()
                 length = cur_song['time']
@@ -282,7 +331,7 @@ class Dispatcher(object):
         return text
 
 
-    def do_song(self, title):
+    def do_search(self, title):
         '''Search for songs by title'''
         tracks = self.client.search('title', title)
         text = ""
@@ -295,7 +344,7 @@ class Dispatcher(object):
                     text += song['file']
         return text
 
-    def do_songadd(self, title):
+    def do_searchadd(self, title):
         '''Search for songs by title and add to current playlist'''
         tracks = self.client.search('title', title)
         text = "Added these to current playlist:\n"
@@ -309,38 +358,5 @@ class Dispatcher(object):
                 except KeyError:
                     pass
         return text
-
-    def do_help(self):
-        return '''
-Relay another stream without disconnecting listeners:
-   /42 switch http://SHOUTCAST_URL.com:8000/stream
-
-Switch to Jukebox mode (chat controlled autodj):
-   /42 jukebox
-
-Skip to next song in Jukebox:
-   /42 next  (or prev for previous)
-
-Load playlist after current song:
-   /42 load <playlist name>
-
-Print current playlist:
-    /42 playlist
-
-Print number of songs, artists and albums in Jukebox:
-   /42 stats
-'''
-
-    def dispatch(self, command, args):
-        '''Execute a command received from Second Life'''
-        mcommand = 'do_' + command
-        if hasattr(self, mcommand):
-            method = getattr(self, mcommand)
-            if args:
-                return method(args)
-            else:
-                return method()
-        else:
-            return "No such command %s" % command
 
 
