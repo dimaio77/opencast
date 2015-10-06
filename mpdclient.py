@@ -15,7 +15,7 @@ import time
 
 import mpd
 
-PLAYLIST_DIR='/var/lib/mpd/playlists/'
+PLAYLIST_DIR = '/var/lib/mpd/playlists/'
 
 
 class MyMPD(object):
@@ -27,9 +27,11 @@ class MyMPD(object):
         pass
 
     def connect(self):
+        '''Connect to mpd server'''
         self.client = mpd.MPDClient(use_unicode=True)
         self.client.connect("localhost", 6600)
         return self.client
+
 
 class Dispatcher(object):
     '''Command dispatcher
@@ -55,7 +57,7 @@ class Dispatcher(object):
     def get_pos(self):
         '''Get current position in playlist'''
         try:
-           return int(self.client.currentsong()['pos'])
+            return int(self.client.currentsong()['pos'])
         except KeyError:
             return 0
 
@@ -136,7 +138,7 @@ class Dispatcher(object):
         '''Skip to song pos in playlist'''
         cur_pos = self.get_pos()
         self.client.play(int(pos) - 1)
-        self.client.delete((0,cur_pos))
+        self.client.delete((0, cur_pos))
         return "Skipping to song %s..." % pos
 
     def do_shuffle(self):
@@ -152,7 +154,7 @@ class Dispatcher(object):
 
     def do_move(self, pos_from, pos_to):
         '''Move song from its position to another in the current playlist'''
-        self.client.move(pos_from -1, pos_to -1)
+        self.client.move(pos_from - 1, pos_to - 1)
 
     def do_load(self, playlist):
         '''Load playlist and start playing it immediately'''
@@ -194,12 +196,12 @@ class Dispatcher(object):
 
     def do_dump(self):
         '''Display full info for current song'''
-        current=self.client.currentsong()
+        current = self.client.currentsong()
         return '%s' % json.dumps(current, indent=1)
 
     def do_current(self):
         '''Display information about current song playing'''
-        current=self.client.currentsong()
+        current = self.client.currentsong()
         if current.has_key('artist') and current.has_key('title'):
             return '%s - %s' % (current['artist'], current['title'])
         elif current.has_key('title'):
@@ -229,11 +231,11 @@ class Dispatcher(object):
 
         cur_song = self.client.currentsong()
         status = self.client.status()
-        #DEBUG
-        #print status
-        #print cur_song
+        # DEBUG
+        # print status
+        # print cur_song
         if int(status['playlistlength']) == 0:
-            #Wait in case playlist is being manipulated, then fill playlist
+            # Wait in case playlist is being manipulated, then fill playlist
             time.sleep(10)
             if int(status['playlistlength']) == 0:
                 self.do_jukebox()
@@ -248,17 +250,17 @@ class Dispatcher(object):
         '''Display stream and song info when in relay mode'''
         cur_song = self.client.currentsong()
         if cur_song.has_key('name'):
-             name = cur_song['name']
+            name = cur_song['name']
         else:
-             name = 'Unknown'
+            name = 'Unknown'
         if cur_song.has_key('title'):
-             title = cur_song['title']
+            title = cur_song['title']
         else:
-             title = 'Unknown - Unknown'
+            title = 'Unknown - Unknown'
         text = "%s" % "\n".join(textwrap.wrap(name, 96))
         text += '\n \n \n'
         try:
-            artist, song =  title.split('-')
+            artist, song = title.split('-')
         except ValueError:
             artist = ""
             song = title
@@ -276,13 +278,13 @@ class Dispatcher(object):
             self.client.delete(0)
         playlist = self.client.playlistid()
         if cur_song.has_key('name'):
-             name = cur_song['name']
+            name = cur_song['name']
         else:
-             name = 'Unknown'
+            name = 'Unknown'
         if cur_song.has_key('title'):
-             title = cur_song['title']
+            title = cur_song['title']
         else:
-             title = 'Unknown - Unknown'
+            title = 'Unknown - Unknown'
         lines = "\n"
         d = 0
         for song in playlist:
@@ -291,7 +293,7 @@ class Dispatcher(object):
             if song.has_key('title'):
                 title = song['title']
             else:
-                #We have a stream queued
+                # We have a stream queued
                 if song['file'].startswith('http'):
                     title = song['file']
                 else:
@@ -313,10 +315,12 @@ class Dispatcher(object):
                 m, s = divmod(int(float(status['elapsed'])), 60)
                 h, m = divmod(m, 60)
                 cur = "%02d:%02d" % (m, s)
-                lines += '* %s) %s - %s (%s/%s)\n' % (pos, artist, title, lcur, cur)
+                lines += '* %s) %s - %s (%s/%s)\n' % (pos,
+                                                      artist, title, lcur, cur)
             else:
                 lines += '  %s) %s - %s\n' % (pos, artist, title)
-            if d >= 10: break
+            if d >= 10:
+                break
         return lines
 
     def do_delete(self, pos):
@@ -342,11 +346,10 @@ class Dispatcher(object):
         pos = self.get_pos()
         i = 0
         for song in tracks:
-            self.client.addid(song['file'], pos+1)
+            self.client.addid(song['file'], pos + 1)
             if i < 10:
                 text += '%s - %s\n' % (song['artist'], song['title'])
         return text
-
 
     def do_search(self, title):
         '''Search for songs by title'''
@@ -368,12 +371,10 @@ class Dispatcher(object):
         pos = self.get_pos()
         i = 0
         for song in tracks:
-            self.client.addid(song['file'], pos+1)
+            self.client.addid(song['file'], pos + 1)
             if i < 10:
                 try:
                     text += '%s - %s\n' % (song['artist'], song['title'])
                 except KeyError:
                     pass
         return text
-
-
