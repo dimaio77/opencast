@@ -76,7 +76,7 @@ Opencast has two modes, relay and jukebox. Relay mode plays a remote stream, juk
 
 `add song <name>`
 
-  Add songs by <name> to the current playlist
+  Add songs named <name> to the current playlist
 
 `search song <name>`
 
