@@ -1,3 +1,7 @@
+
+
+#liquidsoap script to connect to Icecast server and stream input harbor. 
+#
 set("harbor.bind_addr","0.0.0.0")
 
 
