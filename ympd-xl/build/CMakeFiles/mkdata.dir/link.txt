@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu99 -Wall  -rdynamic CMakeFiles/mkdata.dir/tools/mkdata.c.o  -o mkdata 

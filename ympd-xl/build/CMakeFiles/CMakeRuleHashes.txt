@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+9db5d3481c0d1dbbbb4426b5ffb4ac01 assets.c

@@ -1,0 +1,96 @@
+version: "3.7"
+
+services:
+  icecast:
+    container_name: icecast-secret
+    image: cakebread/gigcaster-icecast
+    working_dir: /home/icecast
+    volumes:
+      - ./config:/home/icecast/config
+      - ./certs:/home/icecast/certs
+      - ./content:/home/icecast/content
+      - ./log:/home/icecast/log
+    # restart: unless-stopped
+    # entrypoint: ["supervisord", "-c", "/home/icecast/config/supervisord.conf"]
+    ports:
+      - "8800:8000"
+    networks:
+      - main
+
+  youtube-dl:
+    container_name: youtube-dl-secret
+    build: "./youtube-dl-server"
+    volumes:
+      - ./youtube-dl:/youtube-dl
+      - ./youtube-dl-server/config.yml:/app_config/config.yml
+    restart: always
+    ports:
+      - "8080:8080"
+
+  redis:
+    image: redis:alpine
+    container_name: redis-secret
+    volumes:
+      - redis-data:/data
+    expose:
+      - "6379"
+    networks:
+      - main
+
+  flask:
+    container_name: flask-secret
+    working_dir: /code
+    build: "./flask"
+    volumes:
+      - ./flask:/code
+      - ./content/music:/music
+    environment:
+      - REDIS_HOST=redis
+    ports:
+      - "5001:5000"
+    depends_on:
+      - redis
+    networks:
+      - main
+
+
+  liquidsoap:
+    image: cakebread/gigcaster-liquidsoap:1.4.2
+    container_name: liquidsoap-secret
+    working_dir: /home/liquidsoap
+    volumes:
+      - ./config:/home/liquidsoap/config
+      - ./content:/home/liquidsoap/content
+      - ./log:/home/liquidsoap/log
+    # restart: unless-stopped
+    depends_on:
+      - icecast
+    networks:
+      - main
+    ports:
+      - "1234"
+      - "9091:9091"
+
+  mpd:
+    container_name: mpd-secret
+    cap_add: 
+      - SYS_NICE
+    build:
+      context: ./mpd
+    privileged: false
+    ports:
+      - "6600:6600"
+    networks:
+      - main
+    volumes:
+      - ./config/mpd.conf:/etc/mpd.conf
+      - ./content/music:/var/lib/mpd/music
+      - ./content/playlists:/var/lib/mpd/playlists
+    restart: always
+
+volumes:
+  redis-data:
+
+networks:
+  main:
+    driver: bridge

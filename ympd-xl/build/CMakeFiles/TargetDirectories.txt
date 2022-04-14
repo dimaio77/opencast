@@ -1,0 +1,8 @@
+/home/rob/secret/ympd-xl/build/CMakeFiles/install/strip.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/install/local.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/install.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/list_install_components.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/rebuild_cache.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/ympd.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/edit_cache.dir
+/home/rob/secret/ympd-xl/build/CMakeFiles/mkdata.dir

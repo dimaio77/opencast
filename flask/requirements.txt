@@ -1,0 +1,8 @@
+youtube-dl
+python-mpd
+python-mpd2
+mutagen
+requests
+flask
+flask-cors
+gunicorn

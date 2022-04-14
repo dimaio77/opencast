@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=gnu99 -Wall  -rdynamic CMakeFiles/ympd.dir/src/ympd.c.o CMakeFiles/ympd.dir/src/mpd_client.c.o CMakeFiles/ympd.dir/src/mongoose.c.o CMakeFiles/ympd.dir/src/json_encode.c.o CMakeFiles/ympd.dir/src/http_server.c.o CMakeFiles/ympd.dir/assets.c.o  -o ympd  -lmpdclient -lpthread -lssl -lcrypto 

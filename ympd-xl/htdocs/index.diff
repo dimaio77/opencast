@@ -1,0 +1,23 @@
+diff --git a/htdocs/index.html b/htdocs/index.html
+index 6bf5c60..d57f9b5 100644
+--- a/htdocs/index.html
++++ b/htdocs/index.html
+@@ -87,7 +87,6 @@
+           <div class="panel-heading"><b id="panel-heading">Queue</b></div>
+           <div class="panel-body">
+             <h1>
+-              <span id="track-icon" onclick="clickPlay();" class="glyphicon glyphicon-play"></span>
+               <span id="currenttrack"></span>
+             </h1>
+             <h4>
+@@ -190,8 +189,8 @@
+           </div>
+ 
+           <div id="btn-responsive-block" class="btn-group-vertical btn-block btn-group-lg">
+-            <button type="button" class="btn btn-default" onclick="socket.send('MPD_API_RM_ALL');">
+-              <span class="glyphicon glyphicon-trash"></span> Clear Queue
++            <button type="button" class="btn btn-default" onclick="socket.send('MPD_API_CROP');">
++              <span class="glyphicon glyphicon-trash"></span> Crop Queue
+             </button>
+             <a href="#" data-toggle="modal" data-target="#savequeue" class="btn btn-default">
+               <span class="glyphicon glyphicon-save"></span> Save Queue
