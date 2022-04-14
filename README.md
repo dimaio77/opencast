@@ -11,6 +11,9 @@ HUD
 
 ![HUD screenshot](anticlub_hud_screenshot.png)
 
+The audio player HUD lets you listen to a stream without using the land radio URL. You can listen uninterrupted in any sim and even listen during teleports.
+You HUD relays streams without disconnecting the listener, no more toggling the play button!
+
 How does it work?
 -----------------
 You set the land sound URL to your Opencast server, which relays other streams seamlessly, without disconnecting listeners.
