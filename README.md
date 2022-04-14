@@ -11,8 +11,12 @@ HUD
 
 ![HUD screenshot](anticlub_hud_screenshot.png)
 
-The audio player HUD lets you listen to a stream without using the land radio URL. You can listen uninterrupted in any sim and even listen during teleports.
-You HUD relays streams without disconnecting the listener, no more toggling the play button!
+The simple audio player HUD lets you listen to a stream without using the land radio URL. You can listen uninterrupted in any sim and even listen during teleports.
+Your HUD relays streams without disconnecting the listener, no more toggling the play button! When in jukebox mode, you can issue commands to shuffle, skip songs etc.
+
+The advanced HUD lets you access the songs uploaded to your jukebox. You can queue songs, rearrange them by dragging and dropping. Yes, drag and drop in SL!
+
+![Complex HUD screenshot](advanced_hud.png)
 
 How does it work?
 -----------------
