@@ -18,6 +18,14 @@ The advanced HUD lets you access the songs uploaded to your jukebox. You can que
 
 ![Complex HUD screenshot](complex_hud.png)
 
+Song Board With Playlist History
+--------------------------------
+
+This song board shows the last 10 songs played and can be customized (everything is full perm):
+
+![Song board with history](song_board_history.png)
+
+
 How does it work?
 -----------------
 You set the land sound URL to your Opencast server, which relays other streams seamlessly, without disconnecting listeners.
