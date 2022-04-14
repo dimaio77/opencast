@@ -6,6 +6,11 @@ Advanced audio streaming system for Second Life.
 Opencast solves the problem of listeners disconnecting when an audio stream changes from one Shoutcast or Icecast server to a new one, when the Dj gets disconnected etc.
 It also provides a platform for social djing with a chat controlled jukebox and the possiblity to create games (dj battles, name that tune, etc.).
 
+HUD
+---
+
+![HUD screenshot](anticlub_hud_screenshot.png)
+
 How does it work?
 -----------------
 You set the land sound URL to your Opencast server, which relays other streams seamlessly, without disconnecting listeners.
