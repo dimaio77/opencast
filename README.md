@@ -16,7 +16,7 @@ Your HUD relays streams without disconnecting the listener, no more toggling the
 
 The advanced HUD lets you access the songs uploaded to your jukebox. You can queue songs, rearrange them by dragging and dropping. Yes, drag and drop in SL!
 
-![Complex HUD screenshot](advanced_hud.png)
+![Complex HUD screenshot](complex_hud.png)
 
 How does it work?
 -----------------
