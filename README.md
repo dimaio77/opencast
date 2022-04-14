@@ -30,6 +30,8 @@ How does it work?
 -----------------
 You set the land sound URL to your Opencast server, which relays other streams seamlessly, without disconnecting listeners.
 
+![OpenCast Diagram](opencast_diagram.png)
+
 Software
 --------
 
